@@ -47,6 +47,14 @@ function printHelp() {
 function networkUp() {
   echo -e "${GREEN}Starting HerbionYX Fabric Network...${NC}"
   
+  # Ensure we're in the correct directory
+  echo -e "${YELLOW}Current directory: $(pwd)${NC}"
+  echo -e "${YELLOW}Checking directory structure...${NC}"
+  
+  # Create necessary directories
+  mkdir -p ../channel-artifacts
+  mkdir -p ../organizations
+  
   # Clean up any existing containers and networks
   echo -e "${YELLOW}Cleaning up existing containers...${NC}"
   cd ..
@@ -72,6 +80,15 @@ function networkUp() {
   
   # Generate genesis block BEFORE starting containers
   echo -e "${YELLOW}Generating genesis block...${NC}"
+  
+  # Verify configtx.yaml exists
+  if [ ! -f "configtx.yaml" ]; then
+    echo -e "${RED}Error: configtx.yaml not found in $(pwd)${NC}"
+    echo -e "${YELLOW}Available files:${NC}"
+    ls -la
+    exit 1
+  fi
+  
   generateGenesis
   
   # Start the network
@@ -113,8 +130,17 @@ function networkDown() {
 function generateGenesis() {
   echo -e "${GREEN}Generating genesis block...${NC}"
   
-  # Create channel-artifacts directory
+  # Create channel-artifacts directory if it doesn't exist
   mkdir -p ../channel-artifacts
+  
+  # Verify directory exists
+  if [ ! -d "../channel-artifacts" ]; then
+    echo -e "${RED}Error: channel-artifacts directory could not be created${NC}"
+    exit 1
+  fi
+  
+  echo -e "${YELLOW}Channel artifacts directory: $(pwd)/../channel-artifacts${NC}"
+  ls -la ../channel-artifacts/ || echo "Directory is empty (expected for first run)"
   
   # Generate genesis block for system channel
   configtxgen -profile HerbionYXSystemChannel -channelID system-channel -outputBlock ../channel-artifacts/genesis.block

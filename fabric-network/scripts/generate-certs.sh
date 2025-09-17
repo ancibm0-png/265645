@@ -19,6 +19,12 @@ mkdir -p ../organizations/peerOrganizations/org1.herbionyx.com/users/Admin@org1.
 mkdir -p ../organizations/fabric-ca/org1
 mkdir -p ../channel-artifacts
 
+# Ensure channel-artifacts directory exists
+if [ ! -d "../channel-artifacts" ]; then
+    mkdir -p ../channel-artifacts
+    echo "Created channel-artifacts directory"
+fi
+
 echo "Generating crypto material using cryptogen..."
 
 # Create cryptogen config
